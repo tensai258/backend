@@ -1,0 +1,18 @@
+# 1. 忽略 IDEA 自动生成的开发环境配置（必须忽略）
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# 2. 忽略 Maven 编译生成的 target 文件夹（里面全是临时文件，体积巨大，必须忽略）
+target/
+
+# 3. 忽略 Maven 包装器文件（通常不需要上传）
+.mvn/
+mvnw
+mvnw.cmd
+
+# 4. 忽略编译日志和临时系统文件
+*.log
+.DS_Store
+Thumbs.db
