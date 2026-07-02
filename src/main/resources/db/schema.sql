@@ -172,3 +172,21 @@ CREATE TABLE IF NOT EXISTS kg_relation (
     INDEX idx_target (target_id),
     INDEX idx_course (course_id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='知识图谱关系表';
+
+-- 错题集表
+CREATE TABLE IF NOT EXISTS wrong_question (
+    id BIGINT AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL COMMENT '用户ID',
+    question_id BIGINT NOT NULL COMMENT '题目ID',
+    user_answer TEXT COMMENT '用户提交的答案',
+    mastered INT DEFAULT 0 COMMENT '是否已掌握：0未掌握 1已掌握',
+    wrong_count INT DEFAULT 1 COMMENT '错误次数',
+    category VARCHAR(64) COMMENT '所属分类',
+    create_time DATETIME DEFAULT CURRENT_TIMESTAMP,
+    update_time DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted INT DEFAULT 0,
+    INDEX idx_user (user_id),
+    INDEX idx_question (question_id),
+    INDEX idx_category (category),
+    INDEX idx_user_category (user_id, category)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='错题集表';
