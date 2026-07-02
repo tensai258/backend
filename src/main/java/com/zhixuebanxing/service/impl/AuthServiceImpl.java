@@ -9,10 +9,13 @@ import com.zhixuebanxing.exception.BusinessException;
 import com.zhixuebanxing.mapper.UserMapper;
 import com.zhixuebanxing.service.AuthService;
 import com.zhixuebanxing.util.JwtUtil;
+import com.zhixuebanxing.util.TokenBlacklist;
 import com.zhixuebanxing.vo.LoginVO;
 import com.zhixuebanxing.vo.Result;
 import com.zhixuebanxing.vo.UserVO;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -20,6 +23,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthServiceImpl implements AuthService {
@@ -28,6 +32,7 @@ public class AuthServiceImpl implements AuthService {
     private final UserMapper userMapper;
     private final JwtUtil jwtUtil;
     private final PasswordEncoder passwordEncoder;
+    private final TokenBlacklist tokenBlacklist;
 
     @Override
     public Result<LoginVO> login(LoginDTO loginDTO) {
@@ -105,6 +110,32 @@ public class AuthServiceImpl implements AuthService {
             throw new BusinessException(404, "用户不存在");
         }
         return Result.success(convertToVO(user));
+    }
+
+    @Override
+    public Result<String> logout(String accessToken, String refreshToken) {
+        // 将 access token 加入黑名单
+        if (accessToken != null && !accessToken.isEmpty()) {
+            try {
+                Claims claims = jwtUtil.parseToken(accessToken);
+                tokenBlacklist.add(accessToken, claims.getExpiration().getTime());
+            } catch (Exception e) {
+                log.warn("解析 access token 失败，跳过拉黑: {}", e.getMessage());
+            }
+        }
+
+        // 将 refresh token 加入黑名单
+        if (refreshToken != null && !refreshToken.isEmpty()) {
+            try {
+                Claims claims = jwtUtil.parseToken(refreshToken);
+                tokenBlacklist.add(refreshToken, claims.getExpiration().getTime());
+            } catch (Exception e) {
+                log.warn("解析 refresh token 失败，跳过拉黑: {}", e.getMessage());
+            }
+        }
+
+        log.info("用户已退出登录");
+        return Result.success("退出登录成功");
     }
 
     private UserVO convertToVO(User user) {

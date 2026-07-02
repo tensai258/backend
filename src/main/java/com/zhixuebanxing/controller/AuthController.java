@@ -45,4 +45,15 @@ public class AuthController {
         }
         return Result.error(401, "未登录");
     }
+
+    @PostMapping("/logout")
+    public Result<String> logout(
+            HttpServletRequest request,
+            @RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
+        String accessToken = request.getHeader("Authorization");
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+        return authService.logout(accessToken, refreshToken);
+    }
 }

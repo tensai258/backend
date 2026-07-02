@@ -11,4 +11,5 @@ public interface AuthService {
     Result<Void> register(RegisterDTO registerDTO);
     Result<LoginVO> refreshToken(String refreshToken);
     Result<UserVO> getCurrentUser(Long userId);
+    Result<String> logout(String accessToken, String refreshToken);
 }
