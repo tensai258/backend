@@ -1,7 +1,3 @@
-CREATE DATABASE IF NOT EXISTS zhixuebanxing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-
-USE zhixuebanxing;
-
 -- 用户表
 CREATE TABLE IF NOT EXISTS user (
     id BIGINT AUTO_INCREMENT PRIMARY KEY,

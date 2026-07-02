@@ -33,12 +33,15 @@ public class WrongQuestionServiceImpl implements WrongQuestionService {
     @Override
     @Transactional
     public void addWrongQuestion(Long userId, WrongQuestionDTO dto) {
-        // 判断用户答案是否正确
+        if (userId == null) {
+            log.warn("用户未登录，无法记录错题");
+            return;
+        }
         Question question = questionMapper.selectById(dto.getQuestionId());
         if (question == null) return;
 
-        String correctAnswer = question.getAnswer() != null ? question.getAnswer().trim().toUpperCase() : "";
-        String userAnswer = dto.getUserAnswer() != null ? dto.getUserAnswer().trim().toUpperCase() : "";
+        String correctAnswer = QuestionServiceImpl.normalizeAnswer(question.getAnswer());
+        String userAnswer = QuestionServiceImpl.normalizeAnswer(dto.getUserAnswer());
 
         boolean isCorrect = correctAnswer.equals(userAnswer);
         if (isCorrect) {

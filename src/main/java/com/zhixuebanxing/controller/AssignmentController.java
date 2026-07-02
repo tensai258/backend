@@ -13,6 +13,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/assignment")
 @RequiredArgsConstructor
@@ -56,6 +58,11 @@ public class AssignmentController {
                                         @RequestHeader("Authorization") String authHeader) {
         Long teacherId = extractUserId(authHeader);
         return assignmentService.gradeSubmission(id, submissionId, teacherId, dto);
+    }
+
+    @GetMapping("/{id}/submissions")
+    public Result<List<SubmissionVO>> getSubmissions(@PathVariable Long id) {
+        return assignmentService.getSubmissions(id);
     }
 
     @PostMapping("/personalized")

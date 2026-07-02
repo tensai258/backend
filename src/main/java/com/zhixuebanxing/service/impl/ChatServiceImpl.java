@@ -106,6 +106,15 @@ public class ChatServiceImpl implements ChatService {
         return Result.success(sessionId);
     }
 
+    @Override
+    public Result<Void> deleteSession(String sessionId) {
+        List<Dialogue> dialogues = dialogueMapper.selectBySessionId(sessionId);
+        for (Dialogue d : dialogues) {
+            dialogueMapper.deleteById(d.getId());
+        }
+        return Result.success("会话已删除", null);
+    }
+
     private List<Message> buildMessageHistory(String sessionId, String currentMessage) {
         List<Dialogue> history = dialogueMapper.selectBySessionId(sessionId);
         List<Message> messages = new ArrayList<>();

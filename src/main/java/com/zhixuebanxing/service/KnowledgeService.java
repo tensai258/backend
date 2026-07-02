@@ -9,4 +9,5 @@ public interface KnowledgeService {
     Result<Void> uploadKnowledge(KnowledgeDTO dto);
     Result<PageResult<KnowledgeVO>> listKnowledge(Long courseId, Integer page, Integer size);
     Result<PageResult<KnowledgeVO>> searchKnowledge(String keyword, Integer page, Integer size);
+    Result<Void> deleteDocument(Long id);
 }

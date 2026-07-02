@@ -64,6 +64,17 @@ public class KnowledgeServiceImpl implements KnowledgeService {
         return Result.success(pageResult);
     }
 
+    @Override
+    public Result<Void> deleteDocument(Long id) {
+        Knowledge knowledge = knowledgeMapper.selectById(id);
+        if (knowledge == null) {
+            throw new com.zhixuebanxing.exception.BusinessException(404, "文档不存在");
+        }
+        knowledge.setDeleted(1);
+        knowledgeMapper.updateById(knowledge);
+        return Result.success("文档已删除", null);
+    }
+
     private KnowledgeVO convertToVO(Knowledge knowledge) {
         KnowledgeVO vo = new KnowledgeVO();
         BeanUtils.copyProperties(knowledge, vo);

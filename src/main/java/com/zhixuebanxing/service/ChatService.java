@@ -12,4 +12,5 @@ public interface ChatService {
     Result<String> chatSync(Long userId, ChatRequestDTO dto);
     Result<List<ChatMessageVO>> getHistory(String sessionId);
     Result<String> createSession(Long userId);
+    Result<Void> deleteSession(String sessionId);
 }

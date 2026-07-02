@@ -52,6 +52,11 @@ public class ChatController {
         return chatService.createSession(userId);
     }
 
+    @DeleteMapping("/session/{sessionId}")
+    public Result<Void> deleteSession(@PathVariable String sessionId) {
+        return chatService.deleteSession(sessionId);
+    }
+
     private Long extractUserId(String authHeader) {
         if (authHeader != null && authHeader.startsWith("Bearer ")) {
             String token = authHeader.substring(7);

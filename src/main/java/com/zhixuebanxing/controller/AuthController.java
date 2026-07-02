@@ -1,7 +1,9 @@
 package com.zhixuebanxing.controller;
 
+import com.zhixuebanxing.dto.ChangePasswordDTO;
 import com.zhixuebanxing.dto.LoginDTO;
 import com.zhixuebanxing.dto.RegisterDTO;
+import com.zhixuebanxing.dto.UpdateProfileDTO;
 import com.zhixuebanxing.service.AuthService;
 import com.zhixuebanxing.util.JwtUtil;
 import com.zhixuebanxing.vo.LoginVO;
@@ -37,12 +39,42 @@ public class AuthController {
 
     @GetMapping("/me")
     public Result<UserVO> me(HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null) {
+            return Result.error(401, "未登录");
+        }
+        return authService.getCurrentUser(userId);
+    }
+
+    @PostMapping("/logout")
+    public Result<Void> logout() {
+        return Result.success("已退出登录", null);
+    }
+
+    @PutMapping("/profile")
+    public Result<UserVO> updateProfile(@RequestBody UpdateProfileDTO dto, HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null) {
+            return Result.error(401, "未登录");
+        }
+        return authService.updateProfile(userId, dto);
+    }
+
+    @PostMapping("/change-password")
+    public Result<Void> changePassword(@Valid @RequestBody ChangePasswordDTO dto, HttpServletRequest request) {
+        Long userId = extractUserId(request);
+        if (userId == null) {
+            return Result.error(401, "未登录");
+        }
+        return authService.changePassword(userId, dto);
+    }
+
+    private Long extractUserId(HttpServletRequest request) {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
-            Long userId = jwtUtil.getUserId(token);
-            return authService.getCurrentUser(userId);
+            return jwtUtil.getUserId(token);
         }
-        return Result.error(401, "未登录");
+        return null;
     }
 }

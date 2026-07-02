@@ -36,4 +36,9 @@ public class KnowledgeController {
             @RequestParam(defaultValue = "10") Integer size) {
         return knowledgeService.searchKnowledge(keyword, page, size);
     }
+
+    @DeleteMapping("/documents/{id}")
+    public Result<Void> deleteDocument(@PathVariable Long id) {
+        return knowledgeService.deleteDocument(id);
+    }
 }

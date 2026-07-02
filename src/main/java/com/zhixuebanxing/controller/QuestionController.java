@@ -66,23 +66,22 @@ public class QuestionController {
     @PostMapping("/submit")
     public Result<Map<String, Object>> submitAnswer(@RequestBody WrongQuestionDTO dto) {
         Long userId = SecurityUtil.getCurrentUserId();
+        log.info("提交答案：userId={}, questionId={}, userAnswer={}", userId, dto.getQuestionId(), dto.getUserAnswer());
         boolean isCorrect = questionService.submitAnswer(dto.getQuestionId(), dto.getUserAnswer());
+        log.info("判断结果：isCorrect={}", isCorrect);
 
         Map<String, Object> data = new HashMap<>();
         data.put("correct", isCorrect);
 
         if (!isCorrect) {
-            // 答错了，加入错题集
             wrongQuestionService.addWrongQuestion(userId, dto);
             data.put("message", "答案错误，已加入错题集");
-            // 返回正确答案和解析
             QuestionVO questionVO = questionService.getQuestionById(dto.getQuestionId());
             if (questionVO != null) {
                 data.put("correctAnswer", questionVO.getAnswer());
                 data.put("analysis", questionVO.getAnalysis());
             }
         } else {
-            // 答对了也调用一次，用于标记之前的错题为已掌握
             wrongQuestionService.addWrongQuestion(userId, dto);
             data.put("message", "答案正确！");
         }

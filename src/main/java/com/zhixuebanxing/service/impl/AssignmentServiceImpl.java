@@ -17,6 +17,8 @@ import com.zhixuebanxing.vo.AssignmentVO;
 import com.zhixuebanxing.vo.PageResult;
 import com.zhixuebanxing.vo.Result;
 import com.zhixuebanxing.vo.SubmissionVO;
+
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -112,6 +114,13 @@ public class AssignmentServiceImpl implements AssignmentService {
         submission.setStatus(1);
         submissionMapper.updateById(submission);
         return Result.success("评分成功", null);
+    }
+
+    @Override
+    public Result<List<SubmissionVO>> getSubmissions(Long assignmentId) {
+        List<Submission> submissions = submissionMapper.selectByAssignmentId(assignmentId);
+        List<SubmissionVO> vos = submissions.stream().map(this::convertToSubmissionVO).collect(Collectors.toList());
+        return Result.success(vos);
     }
 
     @Override

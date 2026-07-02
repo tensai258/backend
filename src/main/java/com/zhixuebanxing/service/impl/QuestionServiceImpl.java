@@ -71,16 +71,40 @@ public class QuestionServiceImpl implements QuestionService {
     public boolean submitAnswer(Long questionId, String userAnswer) {
         Question question = questionMapper.selectById(questionId);
         if (question == null) {
+            log.warn("题目不存在：questionId={}", questionId);
             return false;
         }
-        // 标准化比较：去除首尾空格，忽略大小写
         String correctAnswer = question.getAnswer();
         if (correctAnswer == null) {
+            log.warn("题目答案为空：questionId={}", questionId);
             return false;
         }
-        String userAns = userAnswer != null ? userAnswer.trim().toUpperCase() : "";
-        String corAns = correctAnswer.trim().toUpperCase();
-        return userAns.equals(corAns);
+        String userAns = normalizeAnswer(userAnswer);
+        String corAns = normalizeAnswer(correctAnswer);
+        boolean result = userAns.equals(corAns);
+        log.info("答案比较：userAnswer='{}' -> '{}', correctAnswer='{}' -> '{}', result={}",
+                userAnswer, userAns, correctAnswer, corAns, result);
+        return result;
+    }
+
+    /**
+     * 标准化答案：从完整选项文本中提取选项字母（如 "A. 后进先出" -> "A"）
+     */
+    public static String normalizeAnswer(String answer) {
+        if (answer == null) return "";
+        String trimmed = answer.trim();
+        // 匹配 "A." "A)" "A、" "A " 等格式，提取字母部分
+        if (trimmed.length() >= 2 && Character.isLetter(trimmed.charAt(0))) {
+            char second = trimmed.charAt(1);
+            if (second == '.' || second == ')' || second == '、' || second == ' ' || second == '：' || second == ':') {
+                return trimmed.substring(0, 1).toUpperCase();
+            }
+        }
+        // 如果答案本身只有单个字母
+        if (trimmed.length() == 1 && Character.isLetter(trimmed.charAt(0))) {
+            return trimmed.toUpperCase();
+        }
+        return trimmed.toUpperCase();
     }
 
     private QuestionVO toVO(Question q) {
