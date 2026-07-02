@@ -3,6 +3,7 @@ package com.zhixuebanxing.interceptor;
 import com.zhixuebanxing.entity.User;
 import com.zhixuebanxing.mapper.UserMapper;
 import com.zhixuebanxing.util.JwtUtil;
+import com.zhixuebanxing.util.TokenBlacklist;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,11 +27,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
+    private final TokenBlacklist tokenBlacklist;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         String token = getTokenFromRequest(request);
+
+        // 检查 token 是否在黑名单中（已退出登录）
+        if (tokenBlacklist.isBlacklisted(token)) {
+            log.debug("Token 已被拉黑（已退出登录），拒绝访问");
+            filterChain.doFilter(request, response);
+            return;
+        }
 
         if (StringUtils.hasText(token) && jwtUtil.validateToken(token) && !jwtUtil.isRefreshToken(token)) {
             Long userId = jwtUtil.getUserId(token);

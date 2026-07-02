@@ -77,4 +77,15 @@ public class AuthController {
         }
         return null;
     }
+
+    @PostMapping("/logout")
+    public Result<String> logout(
+            HttpServletRequest request,
+            @RequestHeader(value = "X-Refresh-Token", required = false) String refreshToken) {
+        String accessToken = request.getHeader("Authorization");
+        if (accessToken != null && accessToken.startsWith("Bearer ")) {
+            accessToken = accessToken.substring(7);
+        }
+        return authService.logout(accessToken, refreshToken);
+    }
 }
