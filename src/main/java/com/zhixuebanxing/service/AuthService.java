@@ -15,4 +15,5 @@ public interface AuthService {
     Result<UserVO> getCurrentUser(Long userId);
     Result<UserVO> updateProfile(Long userId, UpdateProfileDTO dto);
     Result<Void> changePassword(Long userId, ChangePasswordDTO dto);
+    Result<String> logout(String accessToken, String refreshToken);
 }

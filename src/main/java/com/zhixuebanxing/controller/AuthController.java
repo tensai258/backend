@@ -46,11 +46,6 @@ public class AuthController {
         return authService.getCurrentUser(userId);
     }
 
-    @PostMapping("/logout")
-    public Result<Void> logout() {
-        return Result.success("已退出登录", null);
-    }
-
     @PutMapping("/profile")
     public Result<UserVO> updateProfile(@RequestBody UpdateProfileDTO dto, HttpServletRequest request) {
         Long userId = extractUserId(request);

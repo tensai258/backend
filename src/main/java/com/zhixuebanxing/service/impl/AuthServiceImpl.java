@@ -139,6 +139,13 @@ public class AuthServiceImpl implements AuthService {
         return Result.success("密码修改成功", null);
     }
 
+    @Override
+    public Result<String> logout(String accessToken, String refreshToken) {
+        // JWT 无状态，客户端丢弃 token 即可完成登出
+        // 生产环境可通过 Token 黑名单机制实现
+        return Result.success("已退出登录");
+    }
+
     private UserVO convertToVO(User user) {
         UserVO vo = new UserVO();
         BeanUtils.copyProperties(user, vo);
